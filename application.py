@@ -3,18 +3,11 @@ from flask import Flask, request
 from flaskext.mysql import MySQL
 import index, MySQLdb
 
-# from Entities.MyDatabase import db
-# from Entities.Forum import module as forum_module
-# from Entities.Post import module as post_module
-# from Entities.User import module as user_module
-# from Entities.Thread import module as thread_module
-
 
 app = Flask(__name__)
 mysql = MySQL()
 
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'secret'
 app.config['MYSQL_DATABASE_DB'] = 'rk1'
 #app.config['MYSQL_DATABASE_PORT'] = 9000
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
