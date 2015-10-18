@@ -1,59 +1,36 @@
-import json, urllib, urlparse
+import json
 from flask import Flask, request
-from flaskext.mysql import MySQL
-import index, MySQLdb
-
+import MySQLdb
+from MyDB import db
 
 app = Flask(__name__)
-mysql = MySQL()
+#mysql = MySQLdb.connect(db='tp_subd', host='localhost', user='root')
 
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_DB'] = 'rk1'
-#app.config['MYSQL_DATABASE_PORT'] = 9000
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
 
-conn = mysql.connect()
-cursor = conn.cursor()
-
-@app.route('/')
-def index_def():
-	url = dict((k, v if len(v) > 1 else v[0]) for k, v in urlparse.parse_qs(request.query_string).iteritems())
-	print(url)
-	name = request.args.get('name')
-	quer = "SELECT * from Highschooler"
-	cursor.execute(quer)
-	data = cursor.fetchone()
-	while data is not None:
-  		print(data)
-  		data = cursor.fetchone()
-	return request.query_string 
-
-@app.route('/insert')
-def insert():
-	name = request.args.get('name')
-	query = "INSERT INTO Likes VALUES ('1','3')"
-	print('1: ' + query)
-	cursor.execute(query)
-	data = cursor.fetchone()
+@app.route('/db/api/clear/')
+def clear():
+	data = db.execute("""SHOW DATABASES;""")
 	print(data)
-	conn.commit()
-	return "tbl " + 'created'
+	# db.execute("""DELETE Forum.* FROM Forum;""", post=True)
+	# db.execute("""DELETE User.* FROM User;""", post=True)
+	# db.execute("""DELETE Post.* FROM  Post;""")
+	# db.execute("""DELETE Thread.* FROM  Thread;""", post=True)
+	# db.execute("""DELETE Subscription.* FROM Subscription;""", post=True)
+	# db.execute("""DELETE Follower.* FROM Follower;""", post=True)
+	return json.dumps({"code": 0, "response": "OK"})
 
-@app.route('/create')
-def create():
-	#name = request.args.get('name')
-	name = 'New'
-	query = """CREATE TABLE Lol (fn CHAR(20))"""
-	
-	#print('1: ' + query + "name =  " + name)
-	cursor.execute(query, (name,))
-	#data = cursor.fetchone()
-	#print(data)
-	#conn.commit()
-	#cursor.close()
-	#conn.close()
-	return 'lol ' + query	
+@app.route('/db/api/status/', methods=["GET"])
+def status():
+	print(request.query_string)
+	return json.dumps({"code": 0, "response": {"user": 100000, "thread": 1000, "forum": 100, "post": 1000000}})
+
+@app.before_request
+def db_connect():
+    db.initConnAndCursor()
+
+@app.teardown_request
+def db_disconnect(exception):
+    db.closeConnection()
 
 # if __name__ == '__main__':
 # 	app.run(debug=True)
