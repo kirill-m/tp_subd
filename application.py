@@ -2,15 +2,15 @@ import json
 from flask import Flask, request
 from MyDB import db
 from Forum import module as forum
-# from Post import module as post
-# from User import module as user
-# from Thread import module as thread
+from Post import module as post
+from User import module as user
+from Thread import module as thread
 
 app = Flask(__name__)
 app.register_blueprint(forum)
-# app.register_blueprint(post)
-# app.register_blueprint(user)
-# app.register_blueprint(thread)
+app.register_blueprint(post)
+app.register_blueprint(user)
+app.register_blueprint(thread)
 
 @app.route('/db/api/clear/')
 def clear():

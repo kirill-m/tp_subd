@@ -1,29 +1,30 @@
-import json
-import MySQLdb
-from flask import request
+import json, MySQLdb
+from MyDB import db
+from flask import request, Blueprint
 
+module = Blueprint('post', __name__, url_prefix='/db/api/post')
 
-@app.route("/create/", methods=["POST"])
+@module.route("/create/", methods=["POST"])
 def create():
     request_body = request.json
     return "todo"
 
-@app.route("/list/", methods=["GET"])
+@module.route("/list/", methods=["GET"])
 def list():
     return "todo"
 
-@app.route("/remove/", methods=["POST"])
+@module.route("/remove/", methods=["POST"])
 def remove():
     return "todo"
 
-@app.route("/restore/", methods=["POST"])
+@module.route("/restore/", methods=["POST"])
 def restore():
     return "todo"
 
-@app.route("/update/", methods=["POST"])
+@module.route("/update/", methods=["POST"])
 def update():
     return  "todo"
 
-@app.route("/vote/", methods=["GET"])
+@module.route("/vote/", methods=["POST"])
 def vote():
     return "todo" 

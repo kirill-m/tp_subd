@@ -1,37 +1,38 @@
-import json
-import MySQLdb
-from flask import request
+import json, MySQLdb
+from MyDB import db
+from flask import request, Blueprint
 
+module = Blueprint('user', __name__, url_prefix='/db/api/user')
 
-@app.route("/create/", methods=["POST"])
+@module.route("/create/", methods=["POST"])
 def create():
     request_body = request.json
     return "todo"
 
-@app.route("/details/", methods=["GET"])
+@module.route("/details/", methods=["GET"])
 def details():
     return "todo"
 
-@app.route("/follow/", methods=["POST"])
+@module.route("/follow/", methods=["POST"])
 def follow():
     return "todo"
 
-@app.route("/unfollow/", methods=["POST"])
+@module.route("/unfollow/", methods=["POST"])
 def unfollow():
     return  "todo"
 
-@app.route("/listPosts/", methods=["GET"])
+@module.route("/listPosts/", methods=["GET"])
 def listPosts():
     return "todo"
 
-@app.route("/updateProfile/", methods=["POST"])
+@module.route("/updateProfile/", methods=["POST"])
 def updateProfile():
     return "todo"
 
-@app.route("/listFollowers/", methods=["GET"])
+@module.route("/listFollowers/", methods=["GET"])
 def listFollowers():
     return "todo"
 
-@app.route("/listFollowing/", methods=["GET"])
+@module.route("/listFollowing/", methods=["GET"])
 def listFollowing():
     return "todo"   

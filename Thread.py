@@ -1,49 +1,50 @@
-import json
-import MySQLdb
-from flask import request
+import json, MySQLdb
+from MyDB import db
+from flask import request, Blueprint
 
+module = Blueprint('thread', __name__, url_prefix='/db/api/thread')
 
-@app.route("/create/", methods=["POST"])
+@module.route("/create/", methods=["POST"])
 def create():
     request_body = request.json
     return "todo"
 
-@app.route("/list/", methods=["GET"])
+@module.route("/list/", methods=["GET"])
 def list():
     return "todo"
 
-@app.route("/details/", methods=["GET"])
+@module.route("/details/", methods=["GET"])
 def details():
     return "todo"
 
-@app.route("/remove/", methods=["POST"])
+@module.route("/remove/", methods=["POST"])
 def remove():
     return "todo"
 
-@app.route("/open/", methods=["POST"])
+@module.route("/open/", methods=["POST"])
 def open():
     return  "todo"
 
-@app.route("/close/", methods=["POST"])
+@module.route("/close/", methods=["POST"])
 def close():
     return "todo"
 
-@app.route("/listPosts/", methods=["GET"])
+@module.route("/listPosts/", methods=["GET"])
 def listPosts():
     return "todo"
 
-@app.route("/update/", methods=["POST"])
+@module.route("/update/", methods=["POST"])
 def update():
     return "todo"
 
-@app.route("/subscribe/", methods=["POST"])
+@module.route("/subscribe/", methods=["POST"])
 def subscribe():
     return "todo"
 
-@app.route("/unsubscribe/", methods=["POST"])
+@module.route("/unsubscribe/", methods=["POST"])
 def unsubscribe():
     return "todo"
 
-@app.route("/vote/", methods=["POST"])
+@module.route("/vote/", methods=["POST"])
 def vote():
     return "todo"

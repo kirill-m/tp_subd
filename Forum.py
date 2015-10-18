@@ -4,7 +4,6 @@ from flask import request, Blueprint
 
 module = Blueprint('forum', __name__, url_prefix='/db/api/forum')
 
-
 @module.route("/create/")
 def create():
     request_body = request.json
