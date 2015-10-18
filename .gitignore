@@ -3,3 +3,4 @@
 *.py~
 *.html~
 /dbenv/
+/flask_db/
