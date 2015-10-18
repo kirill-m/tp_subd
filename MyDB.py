@@ -11,23 +11,12 @@ class MyDB:
 		self.initConnAndCursor()
 
 	def execute(self, sql, args=(), post=False):
-		# tm = current_milli_time()
-
-		# try:
 		self.cursor.execute(sql, args)
-		# except Exception as e:
-		#     print "Error %d: %s" % (e.args[0], e.args[1])
-
+		
 		if post:
 			self.connection.commit()
-			# tm = current_milli_time() - tm
-			# if tm > 50:
-			#    print tm, " ", sql
 			return self.cursor.lastrowid
 
-		# tm = current_milli_time() - tm
-		# if tm > 50:
-		#    print tm, " ", sql
 		return self.cursor.fetchall()
 
 	def initConnAndCursor(self):
