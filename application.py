@@ -12,16 +12,14 @@ app.register_blueprint(post)
 app.register_blueprint(user)
 app.register_blueprint(thread)
 
-@app.route('/db/api/clear/')
+@app.route('/db/api/clear/', methods=["POST"])
 def clear():
-	data = db.execute("""SHOW DATABASES;""")
-	print(data)
-	# db.execute("""DELETE Forum.* FROM Forum;""", post=True)
-	# db.execute("""DELETE User.* FROM User;""", post=True)
-	# db.execute("""DELETE Post.* FROM  Post;""")
-	# db.execute("""DELETE Thread.* FROM  Thread;""", post=True)
-	# db.execute("""DELETE Subscription.* FROM Subscription;""", post=True)
-	# db.execute("""DELETE Follower.* FROM Follower;""", post=True)
+	db.execute("""DELETE Forum.* FROM Forum;""", post=True)
+	db.execute("""DELETE User.* FROM User;""", post=True)
+	db.execute("""DELETE Post.* FROM  Post;""")
+	db.execute("""DELETE Thread.* FROM  Thread;""", post=True)
+	db.execute("""DELETE Subscription.* FROM Subscription;""", post=True)
+	db.execute("""DELETE Follower.* FROM Follower;""", post=True)
 	return json.dumps({"code": 0, "response": "OK"})
 
 @app.route('/db/api/status/', methods=["GET"])
@@ -31,11 +29,11 @@ def status():
 
 @app.before_request
 def db_connect():
-    db.initConnAndCursor()
+	db.initConnAndCursor()
 
 @app.teardown_request
 def db_disconnect(exception):
-    db.closeConnection()
+	db.closeConnection()
 
 # if __name__ == '__main__':
 # 	app.run(debug=True)
