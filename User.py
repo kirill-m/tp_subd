@@ -8,21 +8,21 @@ module = Blueprint('user', __name__, url_prefix='/db/api/user')
 
 @module.route("/create/", methods=["POST"])
 def create():
-	request_body = request.json
+	requestBody = request.json
 
-	username = try_encode(request_body.get('username'))
-	about = request_body.get('about')
-	name = try_encode(request_body.get('name'))
-	email = request_body.get('email')
-	is_anonymous_key = request_body.get('isAnonymous', False)
-	if is_anonymous_key:
-		is_anonymous = 1
+	username = try_encode(requestBody.get('username'))
+	about = requestBody.get('about')
+	name = try_encode(requestBody.get('name'))
+	email = requestBody.get('email')
+	isAnonymousKey = requestBody.get('isAnonymous', False)
+	if isAnonymousKey:
+		isAnonymous = 1
 	else:
-		is_anonymous = 0
+		isAnonymous = 0
 
 	sql = """INSERT INTO User (username, about, name, email, isAnonymous) VALUES \
 		(%(username)s, %(about)s, %(name)s, %(email)s, %(isAnonymous)s);"""
-	args = {'username': username, 'about': about, 'name': name, 'email': email, 'isAnonymous': is_anonymous}
+	args = {'username': username, 'about': about, 'name': name, 'email': email, 'isAnonymous': isAnonymous}
 
 	try:
 		db.execute(sql, args, True)
@@ -33,9 +33,9 @@ def create():
 		return json.dumps({"code": 4,
 						   "response": "Oh, we have some really bad error"}, indent=4)
 
-	user_dict = get_user_dict(email)
+	userDict = get_user_dict(email)
 
-	return json.dumps({"code": 0, "response": user_dict}, indent=4)
+	return json.dumps({"code": 0, "response": userDict}, indent=4)
 
 @module.route("/details/", methods=["GET"])
 def details():
@@ -54,31 +54,32 @@ def details():
 
 @module.route("/follow/", methods=["POST"])
 def follow():
-	return follow_method(False)
+	requestBody = request.json
+
+	follower = requestBody.get('follower')
+	followee = requestBody.get('followee')
+
+	args = {'follower': follower, 'following': followee}
+	db.execute("""INSERT INTO Follower (follower, following) VALUES (%(follower)s, %(following)s);""", args, True)
+	
+	return json.dumps({"code": 0, "response": get_user_dict(follower)}, indent=4)
 
 
 @module.route("/unfollow/", methods=["POST"])
 def unfollow():
-	return follow_method(True)
+	requestBody = request.json
 
-
-def follow_method(do_unfollow):
-	request_body = request.json
-
-	follower = request_body.get('follower')
-	followee = request_body.get('followee')
+	follower = requestBody.get('follower')
+	followee = requestBody.get('followee')
 
 	args = {'follower': follower, 'following': followee}
-	if not do_unfollow:
-		db.execute("""INSERT INTO Follower (follower, following) VALUES (%(follower)s, %(following)s);""", args, True)
-	else:
-		db.execute("""DELETE FROM Follower WHERE follower = %(follower)s AND following = %(following)s;""", args, True)
+	db.execute("""DELETE FROM Follower WHERE follower = %(follower)s AND following = %(following)s;""", args, True)
 
 	return json.dumps({"code": 0, "response": get_user_dict(follower)}, indent=4)
 
 
 @module.route("/listPosts/", methods=["GET"])
-def list_posts():
+def listPosts():
 	qs = get_json(request)
 
 	email = qs.get('user')
@@ -89,34 +90,21 @@ def list_posts():
 	limit = qs.get('limit', -1)
 	order = qs.get('order', 'desc')
 
-	post_list = get_post_list(user=email, since=since, limit=limit, order=order)
-	return json.dumps({"code": 0, "response": post_list}, indent=4)
-
-
-@module.route("/updateProfile/", methods=["POST"])
-def update_profile():
-	request_body = request.json
-
-	about = try_encode(request_body.get('about'))
-	email = try_encode(request_body.get('user'))
-	name = try_encode(request_body.get('name'))
-
-	args = {'about': about, 'name': name, 'email': email}
-	db.execute("""UPDATE User SET about = %(about)s, name = %(name)s WHERE email = %(email)s;""", args, True)
-	return json.dumps({"code": 0, "response": get_user_dict(email)}, indent=4)
+	postList = get_post_list(user=email, since=since, limit=limit, order=order)
+	return json.dumps({"code": 0, "response": postList}, indent=4)
 
 
 @module.route("/listFollowers/", methods=["GET"])
-def list_followers():
-	return list_followers_method(False)
+def listFollowers():
+	return listFollowers(False)
 
 
 @module.route("/listFollowing/", methods=["GET"])
-def list_following():
-	return list_followers_method(True)
+def listFollowing():
+	return listFollowers(True)
 
 
-def list_followers_method(is_following):
+def listFollowers(isFollowing):
 	qs = get_json(request)
 
 	email = qs.get('user')
@@ -126,9 +114,9 @@ def list_followers_method(is_following):
 	# Since part
 	since_id = qs.get('since_id', -1)
 	if since_id != -1:
-		since_sql = """AND User.user >= {}""".format(since_id)
+		sinceSql = """AND User.user >= {}""".format(since_id)
 	else:
-		since_sql = ""
+		sinceSql = ""
 
 	# Order part
 	order_sql = """ORDER BY User.name {}""".format(qs.get('order', 'desc'))
@@ -147,29 +135,42 @@ def list_followers_method(is_following):
 		limit_sql = ""
 
 	sql = """SELECT about, email, user, isAnonymous, name, username FROM User JOIN Follower ON """
-	if not is_following:
+	if not isFollowing:
 		sql += """Follower.follower = User.email WHERE Follower.following"""
 	else:
 		sql += """Follower.following = User.email WHERE Follower.follower"""
 
 	sql += """ = %(email)s {since_value} {order_value} {limit_value};""".format(
-		since_value=since_sql, order_value=order_sql, limit_value=limit_sql)
+		since_value=sinceSql, order_value=order_sql, limit_value=limit_sql)
 
-	user_list_sql = db.execute(sql, {'email': email})
-	if not user_list_sql:
+	userListSql = db.execute(sql, {'email': email})
+	if not userListSql:
 		return json.dumps({"code": 1, "response": "Empty set"}, indent=4)
 
 	user_list = list()
-	for user_sql in user_list_sql:
-		follower_email = str_to_json(user_sql[1])
-		user_list.append({'about': str_to_json(user_sql[0]),
-						  'email': follower_email,
-						  'id': str_to_json(user_sql[2]),
-						  'isAnonymous': str_to_json(user_sql[3]),
-						  'name': str_to_json(user_sql[4]),
-						  'username': str_to_json(user_sql[5]),
-						  'followers': get_followers_list(follower_email),
-						  'following': get_following_list(follower_email),
-						  'subscriptions': get_subscribed_threads_list(follower_email)})
+	for userSql in userListSql:
+		followerEmail = str_to_json(userSql[1])
+		user_list.append({'about': str_to_json(userSql[0]),
+						  'email': followerEmail,
+						  'id': str_to_json(userSql[2]),
+						  'isAnonymous': str_to_json(userSql[3]),
+						  'name': str_to_json(userSql[4]),
+						  'username': str_to_json(userSql[5]),
+						  'followers': get_followers_list(followerEmail),
+						  'following': get_following_list(followerEmail),
+						  'subscriptions': get_subscribed_threads_list(followerEmail)})
 
-	return json.dumps({"code": 0, "response": user_list}, indent=4)   
+	return json.dumps({"code": 0, "response": user_list}, indent=4)
+
+
+@module.route("/updateProfile/", methods=["POST"])
+def update_profile():
+	requestBody = request.json
+
+	about = try_encode(requestBody.get('about'))
+	email = try_encode(requestBody.get('user'))
+	name = try_encode(requestBody.get('name'))
+
+	args = {'about': about, 'name': name, 'email': email}
+	db.execute("""UPDATE User SET about = %(about)s, name = %(name)s WHERE email = %(email)s;""", args, True)
+	return json.dumps({"code": 0, "response": get_user_dict(email)}, indent=4)   

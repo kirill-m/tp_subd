@@ -1,9 +1,11 @@
 import json, MySQLdb
 from MyDB import db
 from flask import request, Blueprint
-from general_func import get_forum_dict, get_json, get_user_dict, get_subscribed_threads_list, get_post_list, get_thread_list, str_to_json, get_thread_by_id
+from general_func import get_forum_dict, get_json, get_user_dict, get_subscribed_threads_list, \
+	get_post_list, get_thread_list, str_to_json, get_thread_by_id
 
 module = Blueprint('forum', __name__, url_prefix='/db/api/forum')
+
 
 @module.route("/create/", methods=["POST"])
 def create():
@@ -22,22 +24,24 @@ def create():
 		forumDict = get_forum_dict(short_name=short_name)
 		return json.dumps({"code": 0, "response": forumDict}, indent=4)
 
+
 @module.route("/details/", methods=["GET"])
 def details():
-	qs = get_json(request)
-	short_name = qs.get('forum')
+    qs = get_json(request)
+    short_name = qs.get('forum')
 
-	if not short_name:
-		return json.dumps({"code": 2, "response": "No 'forum' key"}, indent=4)
+    if not short_name:
+        return json.dumps({"code": 2, "response": "No 'forum' key"}, indent=4)
 
-	forum_dict = get_forum_dict(short_name=short_name)
-	if not forum_dict:
-		return json.dumps({"code": 1, "response": "Empty set"}, indent=4)
+    forumDict = get_forum_dict(short_name=short_name)
+    if not forumDict:
+        return json.dumps({"code": 1, "response": "Empty set"}, indent=4)
 
-	if qs.get('related', '') == 'user':
-		forum_dict['user'] = get_user_dict(forum_dict['user'])
+    if qs.get('related', '') == 'user':
+        forumDict['user'] = get_user_dict(forumDict['user'])
 
-	return json.dumps({"code": 0, "response": forum_dict}, indent=4)
+    return json.dumps({"code": 0, "response": forumDict}, indent=4)
+
 
 @module.route("/listPosts/", methods=["GET"])
 def listPosts():
@@ -87,8 +91,9 @@ def listPosts():
 
 	return json.dumps({"code": 0, "response": postList}, indent=4)
 
+
 @module.route("/listThreads/", methods=["GET"])
-def listThread():
+def listThreads():
 	qs = get_json(request)
 
 	forum = qs.get('forum')
@@ -128,6 +133,7 @@ def listThread():
 			thread['forum'] = get_forum_dict(short_name=thread['forum'])
 
 	return json.dumps({"code": 0, "response": threadList}, indent=4)
+	
 
 @module.route("/listUsers/", methods=["GET"])
 def listUsers():
@@ -168,17 +174,17 @@ def listUsers():
 		WHERE User.email IN (SELECT DISTINCT user FROM Post WHERE forum = %(forum)s) {snc_sql} {ord_sql} \
 		{lim_sql};""".format(snc_sql=since_id_sql, lim_sql=limit_sql, ord_sql=order_sql)
 
-	user_list_sql = db.execute(sql, {'forum': qs.get('forum')})
+	userListSql = db.execute(sql, {'forum': qs.get('forum')})
 
-	user_list = list()
-	for user_sql in user_list_sql:
-		email = str_to_json(user_sql[1])
-		user_list.append({'id': str_to_json(user_sql[0]),
+	userList = list()
+	for userSql in userListSql:
+		email = str_to_json(userSql[1])
+		userList.append({'id': str_to_json(userSql[0]),
 						  'email': email,
-						  'name': str_to_json(user_sql[2]),
-						  'username': str_to_json(user_sql[3]),
-						  'isAnonymous': str_to_json(user_sql[4]),
-						  'about': str_to_json(user_sql[5]),
+						  'name': str_to_json(userSql[2]),
+						  'username': str_to_json(userSql[3]),
+						  'isAnonymous': str_to_json(userSql[4]),
+						  'about': str_to_json(userSql[5]),
 						  'subscriptions': get_subscribed_threads_list(email)})
 
-	return json.dumps({"code": 0, "response": user_list}, indent=4)
+	return json.dumps({"code": 0, "response": userList}, indent=4)
