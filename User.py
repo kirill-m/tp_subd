@@ -1,7 +1,9 @@
 import json, MySQLdb
 from MyDB import db
 from flask import request, Blueprint
-from general_func import try_encode, MYSQL_DUPLICATE_ENTITY_ERROR, get_user_dict
+from general_func import try_encode, MYSQL_DUPLICATE_ENTITY_ERROR, get_user_dict, get_json, get_followers_list, \
+	get_following_list, get_subscribed_threads_list, get_post_list, str_to_json
+
 
 module = Blueprint('user', __name__, url_prefix='/db/api/user')
 
@@ -38,7 +40,18 @@ def create():
 
 @module.route("/details/", methods=["GET"])
 def details():
-	return "todo"
+	qs = get_json(request)
+	email = qs.get('user')
+	if not email:
+		return json.dumps({"code": 2, "response": "No 'user' key"}, indent=4)
+
+	user = get_user_dict(email)
+
+	user['followers'] = get_followers_list(email)
+	user['following'] = get_following_list(email)
+	user['subscriptions'] = get_subscribed_threads_list(email)
+
+	return json.dumps({"code": 0, "response": user}, indent=4)
 
 @module.route("/follow/", methods=["POST"])
 def follow():
