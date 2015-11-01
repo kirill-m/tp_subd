@@ -182,5 +182,3 @@ def listUsers():
 						  'subscriptions': get_subscribed_threads_list(email)})
 
 	return json.dumps({"code": 0, "response": user_list}, indent=4)
-
-		   
