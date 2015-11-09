@@ -24,8 +24,17 @@ def clear():
 
 @app.route('/db/api/status/', methods=["GET"])
 def status():
-	print(request.query_string)
-	return json.dumps({"code": 0, "response": {"user": 100000, "thread": 1000, "forum": 100, "post": 1000000}})
+	user_count = db.execute("""SELECT count(*) FROM User;""")
+	thread_count = db.execute("""SELECT count(*) FROM Thread;""")
+	forum_count = db.execute("""SELECT count(*) FROM Forum;""")
+	post_count = db.execute("""SELECT count(*) FROM Post;""")
+	
+	users = user_count[0][0]
+	threads = thread_count[0][0]
+	forums = forum_count[0][0]
+	posts = post_count[0][0]
+	
+	return json.dumps({"code": 0, "response": {"user": users, "thread": threads, "forum": forums, "post": posts}})
 
 @app.before_request
 def db_connect():
