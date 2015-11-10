@@ -13,26 +13,26 @@ CREATE TABLE IF NOT EXISTS `User` (
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Follower` (
-	`follower` VARCHAR(45) NOT NULL, -- follower email
-	`following` VARCHAR(45) NOT NULL -- following email
+	`follower` VARCHAR(45) NOT NULL, 
+	`following` VARCHAR(45) NOT NULL 
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Forum` (
-	`forum` INT NOT NULL AUTO_INCREMENT, -- forum id
-	`name` VARCHAR(45) NOT NULL, -- forum full name
-	`short_name` VARCHAR(45) NOT NULL, -- forum short name
-	`user` VARCHAR(45) NOT NULL, -- founder email
+	`forum` INT NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(45) NOT NULL,
+	`short_name` VARCHAR(45) NOT NULL,
+	`user` VARCHAR(45) NOT NULL,
 	PRIMARY KEY (`forum`),
 	UNIQUE KEY (`name`), 
 	UNIQUE KEY (`short_name`)
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Thread` (
-	`thread` INT NOT NULL AUTO_INCREMENT, -- thread id
-	`title` VARCHAR(45) NOT NULL, -- thread title
-	`user` VARCHAR(45) NOT NULL, -- founder email
+	`thread` INT NOT NULL AUTO_INCREMENT,
+	`title` VARCHAR(45) NOT NULL,
+	`user` VARCHAR(45) NOT NULL,
 	`message` TEXT NOT NULL,
-	`forum` VARCHAR(45) NOT NULL, -- parent forum short_name
+	`forum` VARCHAR(45) NOT NULL,
 	`isDeleted` BOOLEAN NOT NULL DEFAULT 0,
 	`isClosed` BOOLEAN NOT NULL DEFAULT 0,
 	`date` DATETIME NOT NULL DEFAULT '2008-10-07',
@@ -47,18 +47,18 @@ CREATE TABLE IF NOT EXISTS `Thread` (
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Subscription` (
-	`subscriber` VARCHAR(45) NOT NULL, -- subscriber email
-	`thread` INT NOT NULL, -- thread id
+	`subscriber` VARCHAR(45) NOT NULL,
+	`thread` INT NOT NULL,
 	PRIMARY KEY (`subscriber`, `thread`)
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Post` (
-	`post` INT NOT NULL AUTO_INCREMENT, -- post id
-	`user` VARCHAR(45) NOT NULL, -- author email
-	`thread` INT NOT NULL, -- thread id
-	`forum` VARCHAR(45) NOT NULL, -- forum short_name
+	`post` INT NOT NULL AUTO_INCREMENT,
+	`user` VARCHAR(45) NOT NULL,
+	`thread` INT NOT NULL,
+	`forum` VARCHAR(45) NOT NULL,
 	`message` TEXT NOT NULL,
-	`parent` INT NULL DEFAULT NULL, -- parent post id
+	`parent` INT NULL DEFAULT NULL,
 	`date` DATETIME NOT NULL DEFAULT '2008-10-07',
 	`likes` INT NOT NULL DEFAULT 0,
 	`dislikes` INT NOT NULL DEFAULT 0,
@@ -80,33 +80,3 @@ TRUNCATE TABLE `tp_subd`.`Forum`;
 TRUNCATE TABLE `tp_subd`.`Thread`;
 TRUNCATE TABLE `tp_subd`.`Subscription`;
 TRUNCATE TABLE `tp_subd`.`Post`;
-
--- User
--- CREATE UNIQUE INDEX email ON User (email); -- используется, задан в CREATE TABLE
--- CREATE UNIQUE INDEX name_email ON User (name, email); -- используется, задан в CREATE TABLE
--- CREATE UNIQUE INDEX email_name ON User (email, name); -- ???
-
--- Follower
--- CREATE UNIQUE INDEX 'PRIMARY' ON Follower (follower, following); -- используется, задан в CREATE TABLE
--- CREATE UNIQUE INDEX fing_fer ON Follower (following, follower); -- ???
-
--- Forum
--- CREATE UNIQUE INDEX 'PRIMARY' ON Forum (forum); -- задан в CREATE TABLE
--- CREATE UNIQUE INDEX short_name ON Forum (short_name); -- используется, задан в CREATE TABLE
-
--- Thread
--- CREATE UNIQUE INDEX 'PRIMARY' ON Thread (thread); -- используется, задан в CREATE TABLE
--- CREATE UNIQUE INDEX title ON Thread (title); -- задан в CREATE TABLE, ???
--- CREATE INDEX forum ON Thread (forum); -- ???
--- CREATE INDEX user ON Thread (user); -- используется
-
--- Subscription
--- CREATE UNIQUE INDEX 'PRIMARY' ON Subscription (subscriber, thread); -- используется, задан в CREATE TABLE
-
--- Post
--- CREATE UNIQUE INDEX 'PRIMARY' ON Post (post); -- используется, задан в CREATE TABLE
--- CREATE UNIQUE INDEX user_date ON Post (user, date); -- ???, задан в CREATE TABLE
--- CREATE INDEX forum ON Post (forum); -- используется, задан в CREATE TABLE
--- CREATE INDEX user ON Post (user); -- ???
--- CREATE INDEX thread_date ON Post (thread, date); -- используется, задан в CREATE TABLE
--- CREATE INDEX user_date ON Post (user,date); -- используется, задан в CREATE TABLE
