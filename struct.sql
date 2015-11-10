@@ -1,15 +1,13 @@
 DROP TABLE IF EXISTS Forum, Post, Subscription, Thread, User, Follower;
 
 CREATE TABLE IF NOT EXISTS `User` (
-	`user` INT NOT NULL AUTO_INCREMENT, -- user id
-	`email` VARCHAR(45) NOT NULL, -- user email
-	`name` VARCHAR(45) NULL, -- user name
-	`username` VARCHAR(45) NULL, -- user name ???
+	`user` INT NOT NULL AUTO_INCREMENT,
+	`email` VARCHAR(45) NOT NULL,
+	`name` VARCHAR(45) NULL,
+	`username` VARCHAR(45) NULL,
 	`isAnonymous` BOOLEAN NOT NULL DEFAULT 0,
 	`about` TEXT NULL,
-	PRIMARY KEY (`user`),
-	UNIQUE KEY (`email`),
-	UNIQUE KEY name_email (name, email)
+	PRIMARY KEY (`user`)
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Follower` (
@@ -22,9 +20,7 @@ CREATE TABLE IF NOT EXISTS `Forum` (
 	`name` VARCHAR(45) NOT NULL,
 	`short_name` VARCHAR(45) NOT NULL,
 	`user` VARCHAR(45) NOT NULL,
-	PRIMARY KEY (`forum`),
-	UNIQUE KEY (`name`), 
-	UNIQUE KEY (`short_name`)
+	PRIMARY KEY (`forum`)
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Thread` (
@@ -41,9 +37,7 @@ CREATE TABLE IF NOT EXISTS `Thread` (
 	`dislikes` INT NOT NULL DEFAULT 0,
 	`points` INT NOT NULL DEFAULT 0,
 	`posts` INT NOT NULL DEFAULT 0,
-	PRIMARY KEY (`thread`),
-	UNIQUE KEY (`title`),
-	KEY (user)
+	PRIMARY KEY (`thread`)
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `Subscription` (
@@ -68,10 +62,7 @@ CREATE TABLE IF NOT EXISTS `Post` (
 	`isDeleted` BOOLEAN NOT NULL DEFAULT 0,
 	`isHighlighted` BOOLEAN NOT NULL DEFAULT 0,
 	`isApproved` BOOLEAN NOT NULL DEFAULT 0,
-	PRIMARY KEY (`post`),
-	UNIQUE KEY `user_date` (`user`, `date`),
-	KEY (`forum`),
-	KEY `thread_date` (`thread`, `date`)
+	PRIMARY KEY (`post`)
 ) DEFAULT CHARSET=utf8;
 
 TRUNCATE TABLE `tp_subd`.`User`;
@@ -80,3 +71,4 @@ TRUNCATE TABLE `tp_subd`.`Forum`;
 TRUNCATE TABLE `tp_subd`.`Thread`;
 TRUNCATE TABLE `tp_subd`.`Subscription`;
 TRUNCATE TABLE `tp_subd`.`Post`;
+
