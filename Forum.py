@@ -1,8 +1,7 @@
 import json, MySQLdb
-from application import db
 from flask import request, Blueprint
 from general_func import get_forum_dict, get_json, get_user_dict, get_subscribed_threads_list, \
-	get_post_list, get_thread_list, str_to_json, get_thread_by_id
+	get_post_list, get_thread_list, str_to_json, get_thread_by_id, db
 
 module = Blueprint('forum', __name__, url_prefix='/db/api/forum')
 

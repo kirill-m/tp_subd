@@ -1,9 +1,94 @@
 import json
 import urlparse
+import MySQLdb
 
-from MyDB import db
+def try_encode(value):
+	if value is not None:
+		return value.encode('utf-8')
+
+	return value
+
+
+HOST = 'localhost'
+USER = 'root'
+DATABASE = 'tp_subd_perf'
+
+class MyDB:
+	def __init__(self):
+		self.connection = None
+		self.cursor = None
+		self.initConnAndCursor()
+
+	def execute(self, sql, args=(), post=False):
+		self.cursor.execute(sql, args)
+		
+		if post:
+			self.connection.commit()
+			return self.cursor.lastrowid
+
+		return self.cursor.fetchall()
+
+	def initConnAndCursor(self):
+		if not self.connection or not self.connection.open:
+			self.connection = MySQLdb.connect(host=HOST, user=USER, db=DATABASE, use_unicode=1, charset='utf8')
+			self.cursor = self.connection.cursor()
+
+	def closeConnection(self):
+		self.connection.close()
+
+db = MyDB()
 
 MYSQL_DUPLICATE_ENTITY_ERROR = 1062
+
+def inc_posts_for_thread(thread_id):
+	db.execute("""UPDATE Thread SET posts = posts + 1 WHERE thread = %(thread)s;""", {'thread': thread_id}, post=True)
+
+
+def dec_posts_for_thread(thread_id):
+	db.execute("""UPDATE Thread SET posts = posts - 1 WHERE thread = %(thread)s;""", {'thread': thread_id}, post=True)
+
+
+def remove_post(post_id):
+	db.execute("""UPDATE Post SET isDeleted = 1 WHERE post = %(post)s;""", {'post': post_id}, True)
+
+
+def restore_post(post_id):
+	db.execute("""UPDATE Post SET isDeleted = 0 WHERE post = %(post)s;""", {'post': post_id}, True)
+
+
+def get_followers_list(email):
+	followers_list_sql = db.execute("""SELECT follower FROM Follower WHERE following = %(following)s;""",
+									{'following': email})
+	if not followers_list_sql:
+		return list()
+
+	return followers_list_sql[0]
+
+
+def get_following_list(email):
+	following_list = db.execute("""SELECT following FROM Follower WHERE follower = %(follower)s;""",
+								{'follower': email})
+	if not following_list:
+		return list()
+
+	return following_list[0]
+
+
+def get_subscribed_threads_list(email):
+	subscriptions_list = db.execute("""SELECT thread FROM Subscription WHERE subscriber = %(subscriber)s;""",
+									{'subscriber': email})
+	result = list()
+	for thread in subscriptions_list:
+		result.append(thread[0])
+
+	return result
+
+
+def get_json(request):
+	if request.method == 'GET':
+		return dict((k, v if len(v) > 1 else v[0]) for k, v in urlparse.parse_qs(request.query_string).iteritems())
+
+	return request.json
 
 
 def str_to_json(value, is_bool=False):
@@ -12,13 +97,6 @@ def str_to_json(value, is_bool=False):
 
 	if value == "NULL":
 		return None
-
-	return value
-
-
-def try_encode(value):
-	if value is not None:
-		return value.encode('utf-8')
 
 	return value
 
@@ -243,52 +321,3 @@ def get_user_dict(email):
 			'about': str_to_json(user_sql[5])}
 
 
-def inc_posts_for_thread(thread_id):
-	db.execute("""UPDATE Thread SET posts = posts + 1 WHERE thread = %(thread)s;""", {'thread': thread_id}, post=True)
-
-
-def dec_posts_for_thread(thread_id):
-	db.execute("""UPDATE Thread SET posts = posts - 1 WHERE thread = %(thread)s;""", {'thread': thread_id}, post=True)
-
-
-def remove_post(post_id):
-	db.execute("""UPDATE Post SET isDeleted = 1 WHERE post = %(post)s;""", {'post': post_id}, True)
-
-
-def restore_post(post_id):
-	db.execute("""UPDATE Post SET isDeleted = 0 WHERE post = %(post)s;""", {'post': post_id}, True)
-
-
-def get_followers_list(email):
-	followers_list_sql = db.execute("""SELECT follower FROM Follower WHERE following = %(following)s;""",
-									{'following': email})
-	if not followers_list_sql:
-		return list()
-
-	return followers_list_sql[0]
-
-
-def get_following_list(email):
-	following_list = db.execute("""SELECT following FROM Follower WHERE follower = %(follower)s;""",
-								{'follower': email})
-	if not following_list:
-		return list()
-
-	return following_list[0]
-
-
-def get_subscribed_threads_list(email):
-	subscriptions_list = db.execute("""SELECT thread FROM Subscription WHERE subscriber = %(subscriber)s;""",
-									{'subscriber': email})
-	result = list()
-	for thread in subscriptions_list:
-		result.append(thread[0])
-
-	return result
-
-
-def get_json(request):
-	if request.method == 'GET':
-		return dict((k, v if len(v) > 1 else v[0]) for k, v in urlparse.parse_qs(request.query_string).iteritems())
-
-	return request.json
