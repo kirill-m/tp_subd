@@ -6,3 +6,4 @@ log*
 *.html~
 /dbenv/
 /flask_db/
+struct.sql
