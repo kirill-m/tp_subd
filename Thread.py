@@ -1,5 +1,5 @@
 import json, MySQLdb
-from MyDB import db
+from application import db
 from flask import request, Blueprint
 from general_func import get_json, get_thread_list, try_encode, get_forum_dict, get_user_dict, get_post_list, remove_post, \
 	restore_post, str_to_json, get_thread_by_id, MYSQL_DUPLICATE_ENTITY_ERROR

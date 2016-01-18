@@ -1,5 +1,5 @@
 import json, MySQLdb
-from MyDB import db
+from application import db
 from flask import request, Blueprint
 from general_func import get_json, try_encode, inc_posts_for_thread, get_forum_dict, get_user_dict, \
 	remove_post, dec_posts_for_thread, restore_post, get_post_list, get_post_by_id, get_thread_by_id

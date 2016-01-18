@@ -1,5 +1,5 @@
 import json, MySQLdb
-from MyDB import db
+from application import db
 from flask import request, Blueprint
 from general_func import try_encode, MYSQL_DUPLICATE_ENTITY_ERROR, get_user_dict, get_json, get_followers_list, \
 	get_following_list, get_subscribed_threads_list, get_post_list, str_to_json
