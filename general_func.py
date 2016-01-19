@@ -131,12 +131,12 @@ def get_post_list(user="", forum="", thread="", since="", limit=-1, sort='flat',
 	if since != "":
 		since_sql = """AND date >= '{}'""".format(since)
 
-	# sort part TODO
+	# sort part 
 	if sort != 'flat' and sort != 'tree' and sort != 'parent_tree':
 		print "Wrong sort value"
 		return list()
-	# sort_sql = """ORDER BY Post.date {}""".format(sort)
-	sort_sql = """"""
+	sort_sql = """ORDER BY Post.date {}""".format(sort)
+	#sort_sql = """"""
 
 	# limit part
 	limit_sql = ""
